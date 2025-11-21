@@ -1,0 +1,20 @@
+# REGRAS DO SISTEMA - AMBIENTE WINDOWS
+
+## Comandos Críticos (NÃO ESQUECER)
+- Ao executar scripts Python, USE SEMPRE O COMANDO: `py` (Exemplo: `py script.py`).
+- NUNCA use `python` ou `python3` isoladamente, pois este sistema não reconhece.
+- Para instalar pacotes Python, use: `py -m pip install nome_do_pacote`.
+- Para Node.js, use os comandos padrão `node` e `npm`.
+
+## Stack Tecnológica Preferida
+- Banco de Dados: SQLite (arquivo local, sem necessidade de servidor externo).
+- Backend: Node.js (Express) OU Python (Flask) - aguardar definição do projeto.
+
+## Comportamento
+- Verifique se o arquivo existe antes de tentar editá-lo.
+- Se criar um servidor, informe a porta (ex: 3000 ou 5000) e como acessá-la.
+
+## IDIOMA E COMUNICAÇÃO (OBRIGATÓRIO)
+- **Idioma Principal:** Português do Brasil (PT-BR).
+- Todas as explicações, comentários no código e arquivos de documentação (.md) DEVEM ser escritos em Português.
+- Se eu escrever em inglês, você pode responder em inglês. Caso contrário, sempre PT-BR.
