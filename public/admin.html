@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Administrativo - Reciclagem Consciente</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        .admin-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 5%;
+        }
+        .status-pendente { color: #f39c12; font-weight: bold; }
+        .status-aprovado { color: #27ae60; font-weight: bold; }
+        .action-group { display: flex; gap: 0.5rem; }
+        select { padding: 0.5rem; border-radius: 4px; border: 1px solid #ddd; }
+        .btn-approve {
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .btn-approve:hover { background-color: #219150; }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">Reciclagem Consciente (Admin)</div>
+            <ul>
+                <li><a href="index.html">Voltar ao Site</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="admin-container">
+        <h1>Gestão de Coletas</h1>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nome</th>
+                        <th>Material</th>
+                        <th>Peso (kg)</th>
+                        <th>Status</th>
+                        <th>Ponto de Coleta</th>
+                        <th>Ação</th>
+                    </tr>
+                </thead>
+                <tbody id="admin-list">
+                    <!-- Preenchido via JS -->
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const adminList = document.getElementById('admin-list');
+            let pontosColeta = [];
+
+            // Carregar pontos de coleta para o dropdown
+            try {
+                const resPontos = await fetch('/api/pontos');
+                const dataPontos = await resPontos.json();
+                pontosColeta = dataPontos.data;
+            } catch (error) {
+                console.error('Erro ao carregar pontos:', error);
+            }
+
+            // Carregar agendamentos
+            loadAgendamentos();
+
+            async function loadAgendamentos() {
+                try {
+                    const response = await fetch('/api/admin/agendamentos');
+                    const result = await response.json();
+                    renderTable(result.data);
+                } catch (error) {
+                    console.error('Erro ao carregar agendamentos:', error);
+                }
+            }
+
+            function renderTable(data) {
+                adminList.innerHTML = '';
+                if (data.length === 0) {
+                    adminList.innerHTML = '<tr><td colspan="7" style="text-align:center">Nenhum agendamento encontrado.</td></tr>';
+                    return;
+                }
+
+                data.forEach(item => {
+                    const row = document.createElement('tr');
+                    
+                    let actionHtml = '';
+                    let pontoHtml = item.ponto_coleta_nome || '-';
+
+                    if (item.status === 'Pendente') {
+                        const options = pontosColeta.map(p => `<option value="${p.id}">${p.nome_local}</option>`).join('');
+                        pontoHtml = `<select id="ponto-${item.id}"><option value="">Selecione...</option>${options}</select>`;
+                        actionHtml = `<button class="btn-approve" onclick="aprovar(${item.id})">Aprovar</button>`;
+                    }
+
+                    row.innerHTML = `
+                        <td>${item.id}</td>
+                        <td>${item.nome}</td>
+                        <td>${item.tipo_material}</td>
+                        <td>${item.peso_estimado}</td>
+                        <td class="${item.status === 'Aprovado' ? 'status-aprovado' : 'status-pendente'}">${item.status}</td>
+                        <td>${pontoHtml}</td>
+                        <td>${actionHtml}</td>
+                    `;
+                    adminList.appendChild(row);
+                });
+            }
+
+            window.aprovar = async (id) => {
+                const select = document.getElementById(`ponto-${id}`);
+                const pontoId = select.value;
+
+                if (!pontoId) {
+                    alert('Selecione um ponto de coleta.');
+                    return;
+                }
+
+                try {
+                    const response = await fetch('/api/admin/aprovar', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ id_agendamento: id, id_ponto_coleta: pontoId })
+                    });
+
+                    if (response.ok) {
+                        alert('Agendamento aprovado!');
+                        loadAgendamentos();
+                    } else {
+                        alert('Erro ao aprovar.');
+                    }
+                } catch (error) {
+                    console.error('Erro:', error);
+                }
+            };
+        });
+    </script>
+</body>
+</html>

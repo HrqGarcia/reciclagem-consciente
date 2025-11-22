@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const result = await response.json();
 
             if (response.ok) {
-                alert(`Agendamento realizado! Você ganhou ${result.data.pontos} EcoPoints.`);
+                alert(`Agendamento realizado! Você ganhou ${result.data.pontos} EcoPoints (sujeito a aprovação).`);
                 form.reset();
                 loadDashboard(); // Recarregar dashboard
                 // Rolar suavemente para o dashboard
@@ -70,19 +70,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
         data.forEach(item => {
             const row = document.createElement('tr');
+            const statusClass = item.status === 'Aprovado' ? 'color: var(--primary-color);' : 'color: #f39c12;';
+            const statusText = item.status || 'Pendente';
+
             row.innerHTML = `
                 <td>${formatDate(item.data)}</td>
                 <td>${item.tipo_material}</td>
                 <td>${item.peso_estimado} kg</td>
                 <td><strong>${item.pontos}</strong></td>
-                <td><span style="color: var(--primary-color); font-weight: bold;">Agendado</span></td>
+                <td><span style="${statusClass} font-weight: bold;">${statusText}</span></td>
             `;
             agendamentosList.appendChild(row);
         });
     }
 
     function updateStats(data) {
-        const totalPoints = data.reduce((acc, curr) => acc + curr.pontos, 0);
+        // Somar apenas agendamentos aprovados
+        const totalPoints = data
+            .filter(item => item.status === 'Aprovado')
+            .reduce((acc, curr) => acc + curr.pontos, 0);
+
         const totalColetas = data.length;
 
         // Animação simples dos números

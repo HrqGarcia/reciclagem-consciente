@@ -1,0 +1,10 @@
+
+Inicia Servidor
+#  node server.js
+
+Desconecta servidor
+#  taskkill /F /IM node.exe
+
+Recria Banco
+#  py setup_database.py.
+

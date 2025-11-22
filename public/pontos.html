@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pontos de Coleta - Reciclagem Consciente</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <header>
+        <nav>
+            <div class="logo">Reciclagem Consciente ♻️</div>
+            <ul>
+                <li><a href="index.html#home">Home</a></li>
+                <li><a href="index.html#agendar">Agendar Coleta</a></li>
+                <li><a href="index.html#dashboard">Dashboard</a></li>
+                <li><a href="pontos.html" class="active">Pontos de Coleta</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero" style="padding: 2rem 5%; min-height: auto;">
+            <div class="hero-content">
+                <h1>Pontos de Coleta em Santos</h1>
+                <p>Encontre o ponto de entrega voluntária mais próximo de você.</p>
+            </div>
+        </section>
+
+        <section class="cards-container" id="pontos-container" style="margin-bottom: 4rem;">
+            <!-- Pontos de coleta serão inseridos aqui via JS -->
+            <p style="text-align: center; width: 100%;">Carregando pontos de coleta...</p>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Reciclagem Consciente. Todos os direitos reservados.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const container = document.getElementById('pontos-container');
+
+            try {
+                const response = await fetch('/api/pontos');
+                const result = await response.json();
+
+                if (result.data && result.data.length > 0) {
+                    container.innerHTML = '';
+                    result.data.forEach(ponto => {
+                        const card = document.createElement('div');
+                        card.className = 'card';
+                        card.innerHTML = `
+                            <h3>📍 ${ponto.nome_local}</h3>
+                            <p><strong>Endereço:</strong> ${ponto.endereco}</p>
+                            <p><strong>Bairro:</strong> ${ponto.bairro}</p>
+                            <p style="margin-top: 1rem; color: var(--primary-dark);"><strong>Aceita:</strong> ${ponto.tipos_aceitos}</p>
+                        `;
+                        container.appendChild(card);
+                    });
+                } else {
+                    container.innerHTML = '<p style="text-align: center;">Nenhum ponto de coleta encontrado.</p>';
+                }
+            } catch (error) {
+                console.error('Erro ao carregar pontos:', error);
+                container.innerHTML = '<p style="text-align: center; color: red;">Erro ao carregar pontos de coleta.</p>';
+            }
+        });
+    </script>
+</body>
+
+</html>
