@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel Administrativo - Reciclagem Consciente</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         .admin-container {
@@ -12,10 +13,28 @@
             margin: 2rem auto;
             padding: 0 5%;
         }
-        .status-pendente { color: #f39c12; font-weight: bold; }
-        .status-aprovado { color: #27ae60; font-weight: bold; }
-        .action-group { display: flex; gap: 0.5rem; }
-        select { padding: 0.5rem; border-radius: 4px; border: 1px solid #ddd; }
+
+        .status-pendente {
+            color: #f39c12;
+            font-weight: bold;
+        }
+
+        .status-aprovado {
+            color: #27ae60;
+            font-weight: bold;
+        }
+
+        .action-group {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        select {
+            padding: 0.5rem;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+
         .btn-approve {
             background-color: #27ae60;
             color: white;
@@ -25,15 +44,20 @@
             cursor: pointer;
             font-weight: 600;
         }
-        .btn-approve:hover { background-color: #219150; }
+
+        .btn-approve:hover {
+            background-color: #219150;
+        }
     </style>
 </head>
+
 <body>
     <header>
         <nav>
             <div class="logo">Reciclagem Consciente (Admin)</div>
             <ul>
                 <li><a href="index.html">Voltar ao Site</a></li>
+                <li><a href="#" id="btnLogout">Sair (Logout)</a></li>
             </ul>
         </nav>
     </header>
@@ -96,7 +120,7 @@
 
                 data.forEach(item => {
                     const row = document.createElement('tr');
-                    
+
                     let actionHtml = '';
                     let pontoHtml = item.ponto_coleta_nome || '-';
 
@@ -145,7 +169,23 @@
                     console.error('Erro:', error);
                 }
             };
+
+            // Logout Admin
+            document.getElementById('btnLogout').addEventListener('click', async (e) => {
+                e.preventDefault();
+                await fetch('/api/logout', { method: 'POST' });
+                window.location.href = 'index.html';
+            });
+
+            // Verificar se é admin
+            fetch('/api/session').then(res => res.json()).then(data => {
+                if (!data.loggedIn || data.user.type !== 'gestor') {
+                    alert('Acesso negado. Apenas gestores.');
+                    window.location.href = 'login.html';
+                }
+            });
         });
     </script>
 </body>
+
 </html>

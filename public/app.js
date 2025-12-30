@@ -4,54 +4,71 @@ document.addEventListener('DOMContentLoaded', () => {
     const totalPointsEl = document.getElementById('total-points');
     const totalColetasEl = document.getElementById('total-coletas');
 
-    // Carregar dados iniciais
-    loadDashboard();
+    // Carregar dados iniciais apenas se estivermos na página correta
+    if (agendamentosList) {
+        loadDashboard();
+    }
 
-    // Manipular envio do formulário
-    form.addEventListener('submit', async (e) => {
-        e.preventDefault();
+    // Manipular envio do formulário apenas se ele existir
+    if (form) {
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
 
-        const formData = {
-            nome: document.getElementById('nome').value,
-            endereco: document.getElementById('endereco').value,
-            data: document.getElementById('data').value,
-            tipo_material: document.getElementById('tipo_material').value,
-            peso_estimado: parseFloat(document.getElementById('peso_estimado').value)
-        };
+            const formData = {
+                nome: document.getElementById('nome').value,
+                endereco: document.getElementById('endereco').value,
+                data: document.getElementById('data').value,
+                tipo_material: document.getElementById('tipo_material').value,
+                peso_estimado: parseFloat(document.getElementById('peso_estimado').value)
+            };
 
-        try {
-            const response = await fetch('/api/agendar', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(formData)
-            });
+            try {
+                const response = await fetch('/api/agendar', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
 
-            const result = await response.json();
+                const result = await response.json();
 
-            if (response.ok) {
-                alert(`Agendamento realizado! Você ganhou ${result.data.pontos} EcoPoints (sujeito a aprovação).`);
-                form.reset();
-                loadDashboard(); // Recarregar dashboard
-                // Rolar suavemente para o dashboard
-                document.getElementById('dashboard').scrollIntoView({ behavior: 'smooth' });
-            } else {
-                alert('Erro ao agendar: ' + result.error);
+                if (response.ok) {
+                    alert(`Agendamento realizado! Você ganhou ${result.data.pontos} EcoPoints (sujeito a aprovação).`);
+                    form.reset();
+                    loadDashboard(); // Recarregar dashboard
+                    // Rolar suavemente para o dashboard
+                    const dashboardSection = document.getElementById('dashboard');
+                    if (dashboardSection) dashboardSection.scrollIntoView({ behavior: 'smooth' });
+                } else {
+                    if (response.status === 401) {
+                        alert('Sessão expirada. Faça login novamente.');
+                        window.location.href = '/cliente/login.html';
+                    } else {
+                        alert('Erro ao agendar: ' + result.error);
+                    }
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('Erro ao conectar com o servidor.');
             }
-        } catch (error) {
-            console.error('Erro:', error);
-            alert('Erro ao conectar com o servidor.');
-        }
-    });
+        });
+    }
 
     // Função para carregar o dashboard
     async function loadDashboard() {
         try {
             const response = await fetch('/api/agendamentos');
+
+            if (response.status === 401) {
+                // Autenticação falhou, mas deixamos o dashboard.html tratar o redirect inicial para não causar loop se usado em outro lugar
+                console.log("Usuário não logado.");
+                return;
+            }
+
             const result = await response.json();
 
-            if (result.data) {
+            if (result.data && agendamentosList) {
                 renderTable(result.data);
                 updateStats(result.data);
             }

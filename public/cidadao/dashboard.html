@@ -4,8 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reciclagem Consciente</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Dashboard - Reciclagem Consciente</title>
+    <link rel="stylesheet" href="/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 
@@ -14,49 +14,22 @@
         <nav>
             <div class="logo">Reciclagem Consciente ♻️</div>
             <ul>
-                <li><a href="#home">Home</a></li>
-                <li><a href="#agendar">Agendar Coleta</a></li>
-                <li><a href="#dashboard">Dashboard</a></li>
+                <li><a href="index.html">Home</a></li>
                 <li><a href="pontos.html">Pontos de Coleta</a></li>
+                <li><a href="#" id="btnLogout">Sair</a></li>
             </ul>
         </nav>
     </header>
 
     <main>
-        <!-- Seção Home -->
-        <section id="home" class="hero">
-            <div class="hero-content">
-                <h1>Transforme Lixo em Futuro</h1>
-                <p>Agende sua coleta seletiva, acumule pontos e ajude o planeta. Pequenas atitudes geram grandes
-                    mudanças.</p>
-                <a href="#agendar" class="btn-primary">Começar Agora</a>
-            </div>
-            <div class="tips">
-                <h2>Dicas de Reciclagem</h2>
-                <div class="cards-container">
-                    <div class="card">
-                        <h3>🧴 Plástico</h3>
-                        <p>Lave as embalagens para remover resíduos de alimentos.</p>
-                    </div>
-                    <div class="card">
-                        <h3>📄 Papel</h3>
-                        <p>Não amasse o papel, rasgue-o se necessário. Evite papel engordurado.</p>
-                    </div>
-                    <div class="card">
-                        <h3>🥫 Metal</h3>
-                        <p>Latas de alumínio e aço são 100% recicláveis.</p>
-                    </div>
-                    <div class="card">
-                        <h3>🍾 Vidro</h3>
-                        <p>Proteja vidros quebrados para evitar acidentes na coleta.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
+        <div style="max-width: 1000px; margin: 2rem auto; padding: 0 5%;">
+            <h1>Olá, <span id="userName">Usuário</span>!</h1>
+            <p>Gerencie suas coletas e acompanhe seus pontos.</p>
+        </div>
 
         <!-- Seção de Agendamento -->
         <section id="agendar" class="form-section">
-            <h2>Agendar Coleta</h2>
+            <h2>Novo Agendamento</h2>
             <form id="agendamentoForm">
                 <div class="form-group">
                     <label for="nome">Nome Completo</label>
@@ -90,7 +63,7 @@
 
         <!-- Seção Dashboard -->
         <section id="dashboard" class="dashboard-section">
-            <h2>Meu Dashboard</h2>
+            <h2>Meus Pontos</h2>
             <div class="stats">
                 <div class="stat-card">
                     <h3>Total de EcoPoints</h3>
@@ -102,16 +75,16 @@
                 </div>
             </div>
 
-            <h3>Meus Agendamentos</h3>
+            <h3>Histórico de Agendamentos</h3>
             <div class="table-container">
-                <table>
+                <table style="width: 100%;">
                     <thead>
                         <tr>
                             <th>Data</th>
                             <th>Material</th>
                             <th>Peso (kg)</th>
                             <th>Pontos</th>
-                            <th>Status</th>
+                            <th>Status e Ponto</th>
                         </tr>
                     </thead>
                     <tbody id="agendamentos-list">
@@ -122,11 +95,28 @@
         </section>
     </main>
 
-    <footer>
-        <p>&copy; 2024 Reciclagem Consciente. Todos os direitos reservados.</p>
-    </footer>
+    <script src="/app.js"></script>
+    <script>
+        // Lógica de Logout específica
+        document.getElementById('btnLogout').addEventListener('click', async (e) => {
+            e.preventDefault();
+            await fetch('/api/logout', { method: 'POST' });
+            window.location.href = 'index.html';
+        });
 
-    <script src="app.js"></script>
+        // Verificar sessão ao carregar
+        fetch('/api/session')
+            .then(res => res.json())
+            .then(data => {
+                if (!data.loggedIn) {
+                    window.location.href = 'login.html';
+                } else {
+                    document.getElementById('userName').innerText = data.user.nome;
+                    // Preencher nome no formulário se possível
+                    document.getElementById('nome').value = data.user.nome;
+                }
+            });
+    </script>
 </body>
 
 </html>
