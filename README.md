@@ -1,4 +1,5 @@
 Reciclagem Consciente - Santos/SP ♻️
+
 Este projeto é um MVP (Produto Mínimo Viável) desenvolvido como parte da Atividade Extensionista do curso CST GESTÃO DA TECNOLOGIA DA INFORMAÇÃO - DISTÂNCIA. O sistema visa conectar cidadãos à rede de coleta seletiva de Santos, incentivando a reciclagem através de um sistema de agendamento e recompensas (EcoPoints).
 
 🚀 Funcionalidades Principais
